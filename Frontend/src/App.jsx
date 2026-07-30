@@ -1,8 +1,11 @@
 import React from 'react'
+import Register from './Features/Auth/Page/Register'
 
 const App = () => {
   return (
-    <div>App</div>
+   <>
+   <Register/>
+   </>
   )
 }
 
