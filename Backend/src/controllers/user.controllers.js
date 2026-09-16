@@ -6,10 +6,10 @@ import jwt from "jsonwebtoken"
 
 export async function usercontroller(req, res) {
    try {
-      const { username, password, email, name, verified } = req.body
+      const { username, password, email } = req.body
 
       //input check
-      if (!username || !name || !email || !password) {
+      if (!username || !email || !password) {
          return res.status(400).json({
             message: "fill all input required"
          })
@@ -28,7 +28,7 @@ export async function usercontroller(req, res) {
       }
 
       const newuser = await user.create({
-         username, email, name, password
+         username, email, name: username, password
       })
       const emailverifytoken = jwt.sign(
          {
@@ -72,13 +72,10 @@ export async function usercontroller(req, res) {
 
 export async function logincontroller(req, res) {
    try {
-      const { username, password, email } = req.body
+      const { password, email } = req.body
 
       const newuser = await user.findOne({
-         $or: [
-            { email },
-            { username }
-         ]
+         email
       })
       if (!newuser) {
          return res.status(400).json({
@@ -88,7 +85,11 @@ export async function logincontroller(req, res) {
 
       const matchpassword = await newuser.comparePassword(password)
 
-    
+      if (!matchpassword) {
+         return res.status(400).json({
+            message: 'invalid user'
+         })
+      }
 
       if (!newuser.verified) {
          return res.status(400).json({

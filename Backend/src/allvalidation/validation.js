@@ -12,7 +12,6 @@ const validation = (req, res, next) => {
 
 const uservalidation = [
     body("username").trim().isString().notEmpty().withMessage("user name fill compelsury"),
-    body("name").notEmpty().isString().withMessage("required name"),
     body("password").notEmpty().trim().isLength({ min: 6, max: 8 }).withMessage("requird password must"),
     body("email").notEmpty().trim().isEmail().withMessage("required email"),
     validation
