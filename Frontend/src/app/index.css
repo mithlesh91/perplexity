@@ -4,6 +4,8 @@
 body {
 	font-family: 'DM Sans', sans-serif;
 	-webkit-font-smoothing: antialiased;
+	margin: 0;
+	min-width: 320px;
 }
 
 .auth-heading {

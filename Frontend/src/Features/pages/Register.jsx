@@ -1,56 +1,96 @@
 import { useState } from 'react'
-import AuthLayout from './AuthLayout'
+import { useNavigate } from 'react-router-dom'
+import AuthLayout from '../components/AuthLayout'
+import { useAuth } from "../Hook/Auth.use.js"
 
 const Register = () => {
-  const [form, setForm] = useState({ username: '', email: '', password: '' })
-  const [status, setStatus] = useState({ type: '', message: '' })
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const navigate = useNavigate()
+  const [formData, setFormData] = useState({ username: '', email: '', password: '' })
+  const [error, setError] = useState('')
+  const { handleRegister } = useAuth()
+
 
   const handleChange = (event) => {
-    setForm({ ...form, [event.target.name]: event.target.value })
+    setFormData((currentData) => ({ ...currentData, [event.target.name]: event.target.value }))
+    setError('')
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    setStatus({ type: '', message: '' })
-    setIsSubmitting(true)
 
-    try {
-      const response = await fetch('http://localhost:3000/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      const data = await response.json()
-
-      if (!response.ok) throw new Error(Array.isArray(data.message) ? data.message[0].msg : data.message || 'Unable to create account.')
-      setStatus({ type: 'success', message: data.message || 'Account created. Check your email to verify it.' })
-      setForm({ username: '', email: '', password: '' })
-    } catch (error) {
-      setStatus({ type: 'error', message: error.message })
-    } finally {
-      setIsSubmitting(false)
+    if (!formData.username || !formData.email || !formData.password) {
+      setError('Complete all fields to create your account.')
+      return
     }
+
+    const success = await handleRegister(formData.username, formData.email, formData.password)
+
+    if (!success) {
+      setError('Registration failed. Please try again.')
+      return
+    }
+
+    localStorage.setItem('perplexityRegistration', JSON.stringify(formData))
+    navigate('/login')
   }
 
   return (
-    <AuthLayout mode="register" title="Create your account" >
+    <AuthLayout
+      alternateLabel="Sign in"
+      alternateText="Already have an account?"
+      alternateTo="/login"
+      description="Create your account and give your best questions somewhere to go."
+      eyebrow="Start exploring"
+      title="Create your account"
+    >
       <form className="space-y-5" onSubmit={handleSubmit}>
-        <label className="block text-sm font-medium text-slate-200">
+        <label className="block text-sm font-medium text-slate-200" htmlFor="register-username">
           Username
-          <input className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-blue-500 focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/20" type="text" name="username" value={form.username} onChange={handleChange} placeholder="your username" required />
+          <input
+            autoComplete="username"
+            className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/70 focus:ring-4 focus:ring-cyan-300/10"
+            id="register-username"
+            name="username"
+            onChange={handleChange}
+            placeholder="Choose a username"
+            type="text"
+            value={formData.username}
+          />
         </label>
-        <label className="block text-sm font-medium text-slate-200">
+
+        <label className="block text-sm font-medium text-slate-200" htmlFor="register-email">
           Email address
-          <input className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-blue-500 focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/20" type="email" name="email" value={form.email} onChange={handleChange} placeholder="you@example.com" required />
+          <input
+            autoComplete="email"
+            className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/70 focus:ring-4 focus:ring-cyan-300/10"
+            id="register-email"
+            name="email"
+            onChange={handleChange}
+            placeholder="you@example.com"
+            type="email"
+            value={formData.email}
+          />
         </label>
-        <label className="block text-sm font-medium text-slate-200">
+
+        <label className="block text-sm font-medium text-slate-200" htmlFor="register-password">
           Password
-          <input className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-blue-500 focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/20" type="password" name="password" value={form.password} onChange={handleChange} placeholder="6 to 8 characters" minLength={6} maxLength={8} required />
+          <input
+            autoComplete="new-password"
+            className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/70 focus:ring-4 focus:ring-cyan-300/10"
+            id="register-password"
+            minLength="6"
+            name="password"
+            onChange={handleChange}
+            placeholder="At least 6 characters"
+            type="password"
+            value={formData.password}
+          />
         </label>
-        {status.message && <p className={`rounded-lg px-3 py-2 text-sm ${status.type === 'success' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-red-400/10 text-red-300'}`}>{status.message}</p>}
-        <button className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Creating account...' : 'Create account'}
+
+        {error && <p className="text-sm text-rose-300" role="alert">{error}</p>}
+
+        <button className="w-full rounded-xl bg-cyan-300 px-4 py-3.5 text-sm font-bold text-slate-950 transition hover:bg-cyan-200 focus:ring-4 focus:ring-cyan-300/20 focus:outline-none" type="submit">
+          Create account
         </button>
       </form>
     </AuthLayout>
