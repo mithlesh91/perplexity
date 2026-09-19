@@ -12,7 +12,8 @@ import { setuser, setloading, seterror } from "../Auth/Auth.slice"
             return data
             // dispatch(setuser(data))
         } catch (error) {
-            dispatch(seterror(error.message || "Registration failed"))
+            dispatch(seterror(error.response?.data?.message|| error.message || "Registration failed"))
+            throw error
         } finally {
             dispatch(setloading(false))
         }
@@ -25,7 +26,8 @@ import { setuser, setloading, seterror } from "../Auth/Auth.slice"
             dispatch(setuser(data))
             return true
         } catch (error) {
-            dispatch(seterror(error.message || "Login failed"))
+            dispatch(seterror(error.response?.data?.message || error.message || "Login failed"))
+            throw error
         } finally {
             dispatch(setloading(false))
         }

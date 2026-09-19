@@ -1,90 +1,107 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import AuthLayout from '../components/AuthLayout'
-import { useAuth } from "../Hook/Auth.use.js"
+import React from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useAuth } from '../Hook/Auth.use.js';
+
 const Login = () => {
-  const navigate = useNavigate()
-  const [formData, setFormData] = useState({ email: '', password: '' })
-  const [error, setError] = useState('')
+  const [email, setemail] = useState('');
+  const [password, setpassword] = useState('');
+  const [error, seterror] = useState()
 
   const { handleLogin } = useAuth()
+  const navigate = useNavigate()
+  async function handsubmit(e) {
+    e.preventDefault();
 
-  const handleChange = (event) => {
-    setFormData((currentData) => ({ ...currentData, [event.target.name]: event.target.value }))
-    setError('')
-  }
-
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-
-    if (!formData.email || !formData.password) {
-      setError('Enter your email and password to continue.')
-      return
+    try {
+      seterror("")
+      await handleLogin( email, password )
+      navigate("/")
+    } catch (error) {
+      console.log(error)
+      {seterror(error.response?.data?.message || "something went wrong")}
     }
 
-    const success = await handleLogin(formData.email, formData.password)
-
-    if (!success) {
-      setError('Invalid email or password. Please try again.')
-      return
-    }
-
-    localStorage.setItem('perplexityUser', JSON.stringify({ email: formData.email }))
-    navigate('/')
   }
 
   return (
-    <AuthLayout
-      alternateLabel="Create an account"
-      alternateText="New to Perplexity?"
-      alternateTo="/register"
-      description="Pick up where you left off and keep exploring ideas that matter to you."
-      eyebrow="Welcome back"
-      title="Sign in to continue"
-    >
-      <form className="space-y-5" onSubmit={handleSubmit}>
-        <label className="block text-sm font-medium text-slate-200" htmlFor="login-email">
-          Email address
-          <input
-            autoComplete="email"
-            className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/70 focus:ring-4 focus:ring-cyan-300/10"
-            id="login-email"
-            name="email"
-            onChange={handleChange}
-            placeholder="you@example.com"
-            type="email"
-            value={formData.email}
-          />
-        </label>
-
-        <label className="block text-sm font-medium text-slate-200" htmlFor="login-password">
-          Password
-          <input
-            autoComplete="current-password"
-            className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/70 focus:ring-4 focus:ring-cyan-300/10"
-            id="login-password"
-            name="password"
-            onChange={handleChange}
-            placeholder="Enter your password"
-            type="password"
-            value={formData.password}
-          />
-        </label>
-
-        <div className="flex justify-end">
-          <Link className="text-xs font-medium text-slate-400 transition hover:text-cyan-300" to="/register">
-            Need an account?
-          </Link>
+    <div className="min-h-screen bg-slate-950 px-4 py-10 text-white flex items-center justify-center">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl shadow-cyan-500/10 backdrop-blur-sm">
+        <div className="mb-8 text-center">
+          <p className="text-xs font-medium uppercase tracking-[0.28em] text-cyan-300">
+            Welcome back
+          </p>
+          <h1 className="auth-heading mt-3 text-3xl font-bold text-white">
+            Login
+          </h1>
         </div>
 
-        {error && <p className="text-sm text-rose-300" role="alert">{error}</p>}
+        <form onSubmit={handsubmit} className="space-y-5">
+          <div>
+            <label htmlFor="email" className="mb-2 block text-sm text-slate-300">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              placeholder="name@gmail.com"
+              value={email}
+              onChange={(e) => setemail(e.target.value)}
+              className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-4 py-3 text-sm text-white placeholder:text-slate-400 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
+            />
+          </div>
 
-        <button className="w-full rounded-xl bg-cyan-300 px-4 py-3.5 text-sm font-bold text-slate-950 transition hover:bg-cyan-200 focus:ring-4 focus:ring-cyan-300/20 focus:outline-none" type="submit">
-          Sign in
-        </button>
-      </form>
-    </AuthLayout>
-  )
-}
+          <div>
+            <label htmlFor="password" className="mb-2 block text-sm text-slate-300">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setpassword(e.target.value)}
+              className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-4 py-3 text-sm text-white placeholder:text-slate-400 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
+            />
+          </div>
 
-export default Login
+          <div className="flex items-center justify-between text-sm text-slate-400">
+            <label className="flex items-center gap-2">
+              <input type="checkbox" className="h-4 w-4 rounded border-slate-600 bg-slate-900 text-cyan-400 focus:ring-cyan-500" />
+              Remember me
+            </label>
+            <a href="#" className="text-cyan-300 hover:text-cyan-200">
+              Forgot password?
+            </a>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full rounded-xl bg-cyan-400 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+          >
+            Login
+          </button>
+          {error && (<p className='text-red-500'>{error}</p>)}
+        </form>
+
+        <p className="mt-6 text-center text-sm text-slate-400">
+          Don’t have an account?{' '}
+          <NavLink
+            to="/register"
+            className={({ isActive }) =>
+              isActive
+                ? 'font-semibold text-cyan-300 underline underline-offset-4'
+                : 'font-medium text-slate-300 hover:text-cyan-200'
+            }
+          >
+            Register
+          </NavLink>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default Login;

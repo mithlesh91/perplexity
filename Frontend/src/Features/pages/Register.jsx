@@ -1,100 +1,114 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import AuthLayout from '../components/AuthLayout'
-import { useAuth } from "../Hook/Auth.use.js"
+import React from 'react';
+import { NavLink,useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useAuth } from '../Hook/Auth.use.js';
+
 
 const Register = () => {
+  const [username, setusername] = useState('');
+  const [email, setemail] = useState('');
+  const [password, setpassword] = useState('');
+  const [Error, setError] = useState("")
   const navigate = useNavigate()
-  const [formData, setFormData] = useState({ username: '', email: '', password: '' })
-  const [error, setError] = useState('')
-  const { handleRegister } = useAuth()
+  const {handleRegister}=useAuth()
 
+  async function handlesubmit(e) {
+    e.preventDefault();
 
-  const handleChange = (event) => {
-    setFormData((currentData) => ({ ...currentData, [event.target.name]: event.target.value }))
-    setError('')
-  }
+    try {
+      setError("")
+      await handleRegister(username,email,password)
+      navigate("/login")
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-
-    if (!formData.username || !formData.email || !formData.password) {
-      setError('Complete all fields to create your account.')
-      return
+    } catch (error) {
+      console.log(error)
+      {setError(error.response?.data?.message|| "Registation failed")}
     }
-
-    const success = await handleRegister(formData.username, formData.email, formData.password)
-
-    if (!success) {
-      setError('Registration failed. Please try again.')
-      return
-    }
-
-    localStorage.setItem('perplexityRegistration', JSON.stringify(formData))
-    navigate('/login')
   }
 
   return (
-    <AuthLayout
-      alternateLabel="Sign in"
-      alternateText="Already have an account?"
-      alternateTo="/login"
-      description="Create your account and give your best questions somewhere to go."
-      eyebrow="Start exploring"
-      title="Create your account"
-    >
-      <form className="space-y-5" onSubmit={handleSubmit}>
-        <label className="block text-sm font-medium text-slate-200" htmlFor="register-username">
-          Username
-          <input
-            autoComplete="username"
-            className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/70 focus:ring-4 focus:ring-cyan-300/10"
-            id="register-username"
-            name="username"
-            onChange={handleChange}
-            placeholder="Choose a username"
-            type="text"
-            value={formData.username}
-          />
-        </label>
+    <div className="min-h-screen bg-slate-950 px-4 py-10 text-white flex items-center justify-center">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl shadow-cyan-500/10 backdrop-blur-sm">
+        <div className="mb-8 text-center">
+          <p className="text-xs font-medium uppercase tracking-[0.28em] text-cyan-300">
+            Welcome
+          </p>
+          <h1 className="auth-heading mt-3 text-3xl font-bold text-white">
+            Create account
+          </h1>
+        </div>
 
-        <label className="block text-sm font-medium text-slate-200" htmlFor="register-email">
-          Email address
-          <input
-            autoComplete="email"
-            className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/70 focus:ring-4 focus:ring-cyan-300/10"
-            id="register-email"
-            name="email"
-            onChange={handleChange}
-            placeholder="you@example.com"
-            type="email"
-            value={formData.email}
-          />
-        </label>
+        <form onSubmit={handlesubmit} className="space-y-5">
+          <div>
+            <label htmlFor="username" className="mb-2 block text-sm text-slate-300">
+              Username
+            </label>
+            <input
+              id="username"
+              type="text"
+              name="username"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setusername(e.target.value)}
+              className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-4 py-3 text-sm text-white placeholder:text-slate-400 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
+            />
+          </div>
 
-        <label className="block text-sm font-medium text-slate-200" htmlFor="register-password">
-          Password
-          <input
-            autoComplete="new-password"
-            className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/70 focus:ring-4 focus:ring-cyan-300/10"
-            id="register-password"
-            minLength="6"
-            name="password"
-            onChange={handleChange}
-            placeholder="At least 6 characters"
-            type="password"
-            value={formData.password}
-          />
-        </label>
+          <div>
+            <label htmlFor="email" className="mb-2 block text-sm text-slate-300">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              placeholder="name@gmail.com"
+              value={email}
+              onChange={(e) => setemail(e.target.value)}
+              className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-4 py-3 text-sm text-white placeholder:text-slate-400 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
+            />
+          </div>
 
-        {error && <p className="text-sm text-rose-300" role="alert">{error}</p>}
+          <div>
+            <label htmlFor="password" className="mb-2 block text-sm text-slate-300">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setpassword(e.target.value)}
+              className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-4 py-3 text-sm text-white placeholder:text-slate-400 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
+            />
+          </div>
 
-        <button className="w-full rounded-xl bg-cyan-300 px-4 py-3.5 text-sm font-bold text-slate-950 transition hover:bg-cyan-200 focus:ring-4 focus:ring-cyan-300/20 focus:outline-none" type="submit">
-          Create account
-        </button>
-      </form>
-    </AuthLayout>
-  )
-}
+          <button
+            type="submit"
+            className="w-full rounded-xl bg-cyan-400 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+          >
+            Sign up
+          </button>
+          {Error && (<p className='text-red-500'>{Error}</p>)}
+        </form>
 
-export default Register
+        <p className="mt-6 text-center text-sm text-slate-400">
+          Already have an account?{' '}
+          <NavLink
+            to="/login"
+            className={({ isActive }) =>
+              isActive
+                ? 'font-semibold text-cyan-300 underline underline-offset-4'
+                : 'font-medium text-slate-300 hover:text-cyan-200'
+            }
+          >
+            Login
+          </NavLink>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default Register;
