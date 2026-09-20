@@ -15,5 +15,9 @@ app.use(cookieParser())
 
 //user router
 
-import { Rrouter } from "./routes.js/user.router.js"
+import { Rrouter } from "./routes/user.router.js"
 app.use("/api",Rrouter)
+
+// Ai router
+import { agent } from './routes/agent.router.js'
+app.use("/api",agent)

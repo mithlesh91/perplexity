@@ -1,4 +1,4 @@
-import { register, login, getUser, logout } from "../Auth/auth.api"
+import { register, login, getUser, logout, chatbot } from "../Auth/auth.api"
 import { useDispatch } from "react-redux"
 import { setuser, setloading, seterror } from "../Auth/Auth.slice"
 
@@ -58,10 +58,23 @@ import { setuser, setloading, seterror } from "../Auth/Auth.slice"
         }
     }
 
+    const handlechatbot = async (message)=>{
+        try {
+            dispatch(setloading(true))
+            return await chatbot(message)
+        } catch (error) {
+            dispatch(seterror(error.response?.data?.message || error.message || "chatbot failed"))
+            throw error
+        }finally{
+            dispatch(setloading(false))
+        }
+    }
+
     return {
         handleRegister,
         handleLogin,
         handleGetUser,
-        handleLogout
+        handleLogout,
+        handlechatbot
     }
 }
