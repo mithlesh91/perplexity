@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { RouterProvider } from 'react-router-dom'
-import { useAuth } from '../Features/Hook/Auth.use.js'
+import { useAuth } from '../Features/Auth/Hook/Auth.use.js'
 import router from './Approuter.jsx'
 const App = () => {
   const { handleGetUser } = useAuth()

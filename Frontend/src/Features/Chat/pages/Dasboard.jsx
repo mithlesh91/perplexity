@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../Hook/Auth.use.js';
+import {useAuth} from "../../Auth/Hook/Auth.use.js"
+import {usechat} from "../Hook/chat.hook.js"
+
 
 const Dashboard = () => {
   const user = useSelector((state) => state.auth.user);
@@ -18,7 +20,16 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Logout failed:', error);
     }
+
   };
+
+  const {initlazationSocket} =usechat()
+
+  useEffect(()=>{
+    initlazationSocket()
+  })
+  
+
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
@@ -77,10 +88,6 @@ const Dashboard = () => {
                   aria-label="Send message"
                   className="flex h-10 w-20 shrink-0 items-center justify-center rounded-[10px] bg-slate-900 text-white transition hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-100"
                 >
-                  {/* <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="m5 12 14-7-4 14-3-6-7-1Z" />
-                    <path d="m12 13 4-4" />
-                  </svg> */}
                   search
                 </button>
               </div>
@@ -93,3 +100,27 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+// import React, { useEffect } from 'react'
+// import { useSelector } from 'react-redux'
+// import {usechat} from '../Hook/chat.hook'
+
+// const Dasboard = () => {
+
+//   const chat = usechat()
+//   const user = useSelector(state=>state.auth)
+  
+//   console.log(user)
+//   useEffect(()=>{
+//     chat.initlazationSocket()
+//   },[])
+
+
+//   return (
+//     <div>
+//       hello
+//     </div>
+//   )
+// }
+
+// export default Dasboard
