@@ -2,11 +2,16 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../Hook/Auth.use.js';
+import { useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 
 const Login = () => {
   const [email, setemail] = useState('');
   const [password, setpassword] = useState('');
   const [error, seterror] = useState()
+
+  const user = useSelector(state => state.auth.user)
+  const loading = useSelector(state => state.auth.loading)
 
   const { handleLogin } = useAuth()
   const navigate = useNavigate()
@@ -15,15 +20,22 @@ const Login = () => {
 
     try {
       seterror("")
-      await handleLogin( email, password )
+      await handleLogin(email, password)
       navigate("/")
     } catch (error) {
       console.log(error)
-      {seterror(error.response?.data?.message || "something went wrong")}
+      { seterror(error.response?.data?.message || "something went wrong") }
     }
+
 
   }
 
+  console.log("loading:", loading);
+  console.log("user:", user);
+
+  if (!loading && user) {
+    return <Navigate to="/" replace />
+  }
   return (
     <div className="min-h-screen bg-slate-950 px-4 py-10 text-white flex items-center justify-center">
       <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl shadow-cyan-500/10 backdrop-blur-sm">

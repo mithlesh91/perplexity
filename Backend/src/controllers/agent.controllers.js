@@ -1,12 +1,12 @@
 import { agent } from "../service/service.ai.js";
-import { HumanMessage } from "langchain";
+import { HumanMessage } from "@langchain/core/messages";
 
 
  async function agentcontroller (req, res)  {
     try {
         const { message } = req.body;
 
-        if (!message) {
+        if (typeof message !== "string" || !message.trim()) {
             return res.status(400).json({
                 message: "Message is required",
             });
@@ -14,7 +14,7 @@ import { HumanMessage } from "langchain";
 
         const response = await agent.invoke({
             messages: [
-                new HumanMessage(message)
+                new HumanMessage(message.trim())
             ],
         });
 
@@ -30,7 +30,7 @@ import { HumanMessage } from "langchain";
 
         res.status(500).json({
             message: "AI agent failed",
-            error: error.message,
+            error: error.message || "Unknown AI error",
         });
     }
 }

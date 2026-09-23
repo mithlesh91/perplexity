@@ -19,25 +19,10 @@ const Emailtool = tool(sendMail, {
 });
 
 const model = new ChatMistralAI({
-  model: "mistral-tiny",
-  // apiKey: process.env.MISTRAL_API_KEY,
+  model:"mistral-tiny",
 });
 
 export const agent = createAgent({
   model,
   tools: [Emailtool],
 });
-
-const testAI = async () => {
-  try {
-    const response = await model.invoke("Say hello in one sentence");
-
-    console.log("AI WORKING ✅");
-    console.log(response.content);
-  } catch (error) {
-    console.error("AI NOT WORKING ❌");
-    console.error(error);
-  }
-};
-
-testAI();

@@ -1,7 +1,14 @@
-import React from 'react'
+import { useEffect } from 'react'
 import { RouterProvider } from 'react-router-dom'
-import router from '../Approuter'
+import { useAuth } from '../Features/Hook/Auth.use.js'
+import router from './Approuter.jsx'
 const App = () => {
+  const { handleGetUser } = useAuth()
+
+  useEffect(() => {
+    handleGetUser()
+  }, [])
+
   return (
     <>
     

@@ -7,7 +7,7 @@ export async function getcotroller(req, res) {
 
         res.status(200).json({
             message: "user is fatched",
-            users
+            user:users
         })
     } catch (error) {
     

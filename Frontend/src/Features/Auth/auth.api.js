@@ -16,7 +16,7 @@ export const login = async (email,password)=>{
 }
 
 export const getUser = async () => {
-    const response = await api.get("/user")
+    const response = await api.get("/profile")
     return response.data
 }   
 

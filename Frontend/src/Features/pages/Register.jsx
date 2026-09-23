@@ -1,7 +1,8 @@
 import React from 'react';
-import { NavLink,useNavigate } from 'react-router-dom';
+import { NavLink,useNavigate,Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../Hook/Auth.use.js';
+import { useSelector } from 'react-redux';
 
 
 const Register = () => {
@@ -9,6 +10,10 @@ const Register = () => {
   const [email, setemail] = useState('');
   const [password, setpassword] = useState('');
   const [Error, setError] = useState("")
+
+ const user = useSelector(state=>state.auth.user)
+ const loading = useSelector(state=>state.auth.loading)
+
   const navigate = useNavigate()
   const {handleRegister}=useAuth()
 
@@ -24,6 +29,10 @@ const Register = () => {
       console.log(error)
       {setError(error.response?.data?.message|| "Registation failed")}
     }
+  }
+
+  if (!loading && user) {
+    return <Navigate to="/" replace />
   }
 
   return (
