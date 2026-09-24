@@ -16,4 +16,4 @@ const massageSchema = new mongoose.Schema({
     }
 },{timestamps:true})
 
-const massagemodel = mongoose.model("massage",massageSchema)
+export const massegemodel = mongoose.model("massage",massageSchema)

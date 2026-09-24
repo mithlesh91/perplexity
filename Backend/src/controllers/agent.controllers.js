@@ -1,37 +1,32 @@
-import { agent } from "../service/service.ai.js";
-import { HumanMessage } from "@langchain/core/messages";
+import { generateresponse, generatechattitle } from "../service/service.ai.js"
+import  { chatmodel } from "../models/chat.model.js"
+import {massegemodel} from "../models/message.model.js"
 
-
- async function agentcontroller (req, res)  {
+async function agentcontroller(req, res) {
     try {
-        const { message } = req.body;
+        const { message } = req.body
+        const title = await generatechattitle(message)
+        const result = await generateresponse(message)
+        const chat = await chatmodel.create({
+            user:req.user.id,
+            title
 
-        if (typeof message !== "string" || !message.trim()) {
-            return res.status(400).json({
-                message: "Message is required",
-            });
-        }
+        })
 
-        const response = await agent.invoke({
-            messages: [
-                new HumanMessage(message.trim())
-            ],
-        });
-
-        const lastMessage =
-            response.messages[response.messages.length - 1];
+        const aiMessage = await massegemodel.create({
+              chat:chat._id,
+              content:result,
+              role:"ai"
+        })
 
         res.status(200).json({
-            message: lastMessage.content,
-        });
-
+            aiMessage,
+            chat,
+            title
+            
+        })
     } catch (error) {
-        console.error(error);
-
-        res.status(500).json({
-            message: "AI agent failed",
-            error: error.message || "Unknown AI error",
-        });
+        console.error("error from " + error)
     }
 }
 

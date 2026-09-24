@@ -6,7 +6,6 @@ export const initlazationSocket = () => {
     });
 
     socket.on("connect", () => {
-        console.log("Connected to Socket.IO server");
         console.log("Socket ID:", socket.id);
     });
 
