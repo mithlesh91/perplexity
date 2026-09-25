@@ -24,7 +24,7 @@ async function agentcontroller(req, res) {
         })
 
 
-        const messages = await massegemodel.find({ chat: chatId })
+        const messages = await massegemodel.find({ chat: chatId || chat._id })
 
         const result = await generateresponse(messages)
 

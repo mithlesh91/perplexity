@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {useAuth} from "../../Auth/Hook/Auth.use.js"
-import {usechat} from "../Hook/chat.hook.js"
+import { useAuth } from "../../Auth/Hook/Auth.use.js"
+import { usechat } from "../Hook/chat.hook.js"
+
 
 
 const Dashboard = () => {
@@ -23,104 +24,69 @@ const Dashboard = () => {
 
   };
 
-  const {initlazationSocket} =usechat()
+  const { initlazationSocket } = usechat()
 
-  useEffect(()=>{
+  useEffect(() => {
     initlazationSocket()
   })
-  
+
 
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <header className="mb-8 flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-600">
-              Perplexity
-            </p>
-            <h1 className="mt-1 text-2xl font-bold text-slate-900">Dashboard</h1>
-          </div>
-
+    <main className="min-h-screen bg-[#f4f1ea] p-3 text-[#242421] sm:p-5">
+      <div className="mx-auto min-h-[calc(100vh-1.5rem)] max-w-375 rounded-4xl border border-[#242421] bg-[#fbfaf6] shadow-[8px_8px_0_#242421] sm:min-h-[calc(100vh-2.5rem)]">
+        <header className="flex items-center justify-between border-b border-[#d6d1c7] px-5 py-5 sm:px-8">
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => navigate('/register')}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-cyan-300 hover:text-cyan-700"
-            >
-              Sign up
-            </button>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
-            >
-              Logout
-            </button>
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d8f26a] text-sm font-black">P</div>
+            <div>
+              <p className="font-mono text-lg font-bold tracking-[-0.08em]">perplexity</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#77756e]">Your workspace</p>
+            </div>
           </div>
+          <button type="button" onClick={handleSignOut} className="rounded-full border border-[#242421] bg-[#fffdf8] px-4 py-2 font-mono text-xs font-bold transition hover:bg-[#d8f26a]">
+            Log out
+          </button>
         </header>
 
-        <main className="space-y-6">
-
-
-          <section className="flex min-h-[420px] flex-col rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-100 text-2xl font-bold text-cyan-700">
-                AI
-              </div>
-              <h2 className="mt-5 text-2xl font-bold text-slate-900">How can I help you today?</h2>
-
+        <section className="mx-auto max-w-5xl px-5 py-12 sm:px-10 sm:py-20">
+          <div className="flex flex-col justify-between gap-8 sm:flex-row sm:items-end">
+            <div>
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.28em] text-[#ef6b4a]">Good to see you, {displayName}</p>
+              <h1 className="mt-4 max-w-2xl font-sans text-4xl font-extrabold tracking-[-0.07em] sm:text-6xl">What should we think through?</h1>
             </div>
+            <p className="max-w-xs text-sm leading-6 text-[#77756e]">Ask questions, explore ideas, and keep your thinking in one place.</p>
+          </div>
 
-            <form
-              className="border-t border-slate-100 p-4 sm:p-5"
-              onSubmit={(event) => event.preventDefault()}
-            >
-              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-2 pl-4 transition focus-within:border-cyan-400 focus-within:bg-white focus-within:ring-4 focus-within:ring-cyan-100">
-                <input
-                  type="text"
-                  aria-label="Message AI"
-                  placeholder="Message AI..."
-                  className="min-w-0 flex-1 bg-transparent py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400"
-                />
-                <button
-                  type="submit"
-                  aria-label="Send message"
-                  className="flex h-10 w-20 shrink-0 items-center justify-center rounded-[10px] bg-slate-900 text-white transition hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-100"
-                >
-                  search
-                </button>
+          <div className="mt-12 grid gap-5 md:grid-cols-[1.35fr_1fr]">
+            <button type="button" onClick={() => navigate('/chat')} className="group min-h-64 rounded-3xl border border-[#242421] bg-[#d8f26a] p-6 text-left shadow-[5px_5px_0_#242421] transition hover:-translate-y-1 hover:shadow-[7px_7px_0_#242421] sm:p-8">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#242421] bg-[#fbfaf6] font-mono font-bold">+</div>
+              <div className="mt-16 flex items-end justify-between gap-4">
+                <div>
+                  <p className="font-mono text-xs font-bold uppercase tracking-[0.2em]">New conversation</p>
+                  <p className="mt-2 text-2xl font-extrabold tracking-[-0.05em]">Start exploring</p>
+                </div>
+                <span className="text-3xl transition-transform group-hover:translate-x-1">↗</span>
               </div>
-            </form>
-          </section>
-        </main>
+            </button>
+
+            <div className="rounded-3xl border border-[#d6d1c7] bg-[#e6e1d7] p-6 sm:p-8">
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#77756e]">Recent chats</p>
+              <div className="mt-5 space-y-3">
+                {['Research notes', 'Product strategy', 'Weekend ideas'].map((chat) => (
+                  <button key={chat} type="button" onClick={() => navigate('/chat')} className="flex w-full items-center justify-between border-b border-[#c8c2b7] pb-3 text-left font-mono text-sm transition hover:text-[#ef6b4a]">
+                    <span>{chat}</span>
+                    <span>→</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 };
 
 export default Dashboard;
 
-// import React, { useEffect } from 'react'
-// import { useSelector } from 'react-redux'
-// import {usechat} from '../Hook/chat.hook'
 
-// const Dasboard = () => {
-
-//   const chat = usechat()
-//   const user = useSelector(state=>state.auth)
-  
-//   console.log(user)
-//   useEffect(()=>{
-//     chat.initlazationSocket()
-//   },[])
-
-
-//   return (
-//     <div>
-//       hello
-//     </div>
-//   )
-// }
-
-// export default Dasboard
