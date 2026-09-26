@@ -21,3 +21,109 @@ h6,
 .auth-heading {
 	font-family: 'Manrope', sans-serif;
 }
+
+.markdown-content > :first-child {
+	margin-top: 0;
+}
+
+.markdown-content > :last-child {
+	margin-bottom: 0;
+}
+
+.markdown-content p,
+.markdown-content ul,
+.markdown-content ol,
+.markdown-content blockquote,
+.markdown-content pre,
+.markdown-content table {
+	margin: 0.75rem 0;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+	font-weight: 800;
+	line-height: 1.35;
+	margin: 1rem 0 0.5rem;
+}
+
+.markdown-content h1 {
+	font-size: 1.25rem;
+}
+
+.markdown-content h2 {
+	font-size: 1.125rem;
+}
+
+.markdown-content h3 {
+	font-size: 1rem;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+	padding-left: 1.5rem;
+}
+
+.markdown-content ul {
+	list-style: disc;
+}
+
+.markdown-content ol {
+	list-style: decimal;
+}
+
+.markdown-content li + li {
+	margin-top: 0.25rem;
+}
+
+.markdown-content blockquote {
+	border-left: 2px solid #ef6b4a;
+	color: #77756e;
+	padding-left: 0.75rem;
+}
+
+.markdown-content :not(pre) > code {
+	background: #f4f1ea;
+	border-radius: 0.25rem;
+	font-family: monospace;
+	padding: 0.125rem 0.25rem;
+}
+
+.markdown-content pre {
+	background: #242421;
+	border-radius: 0.5rem;
+	color: #fff;
+	overflow-x: auto;
+	padding: 0.75rem;
+}
+
+.markdown-content pre code {
+	font-family: monospace;
+}
+
+.markdown-content a {
+	color: #c5482f;
+	text-decoration: underline;
+}
+
+.markdown-content table {
+	display: block;
+	max-width: 100%;
+	overflow-x: auto;
+	white-space: nowrap;
+}
+
+.markdown-content th,
+.markdown-content td {
+	border: 1px solid #d6d1c7;
+	padding: 0.375rem 0.625rem;
+}
+
+.markdown-content th {
+	background: #f4f1ea;
+	font-weight: 700;
+}
+
+.markdown-content hr {
+	border-color: #d6d1c7;
+}

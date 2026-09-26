@@ -101,15 +101,15 @@ export async function deletechat(req, res) {
             _id: chatId,
             user: req.user.id
         })
-        await massegemodel.deleteMany({
-            chat: chatId
-        })
-
         if (!chat) {
             return res.status(404).json({
                 message: "chat is not found"
             })
         }
+
+        await massegemodel.deleteMany({
+            chat: chatId
+        })
 
         res.status(200).json({
             message: "chat is deleted"

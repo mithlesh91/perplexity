@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { useNavigate } from 'react-router-dom'
 import { usechat } from '../Hook/chat.hook.js'
 
 const Chatpage = () => {
   const navigate = useNavigate()
   const [message, setMessage] = useState('')
-  const { chats, currentchatId, isLoading, error, handleSendmsg, handledeletechat, handlegetchats,  handleSelectChat, handleNewChat } = usechat()
+  const { chats, currentchatId, isLoading, error, handleSendmsg, handleNewChat, handleSelectChat, handleDeleteChat } = usechat()
   const currentChat = currentchatId ? chats[currentchatId] : null
   const messages = currentChat?.messages || []
   const chatList = Object.entries(chats)
-
-  useEffect(() => {
-    handlegetchats().catch(() => {})
-  }, [])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -43,27 +41,23 @@ const Chatpage = () => {
 
           <nav className="mt-4 space-y-2" aria-label="Chat history">
             {chatList.map(([chatId, chat]) => (
-              <div
-                key={chatId}
-                className={`flex w-full items-center gap-2 rounded-xl border px-3 py-2 transition ${currentchatId === chatId ? 'border-[#242421] bg-[#fbfaf6] shadow-[3px_3px_0_#242421]' : 'border-transparent hover:border-[#aaa69c]'}`}
-              >
+              <div key={chatId} className="group flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => handleSelectChat(chatId)}
-                  className="flex min-w-0 flex-1 items-center gap-3 py-1 text-left font-mono text-sm"
+                  className={`flex min-w-0 flex-1 items-center gap-3 rounded-xl border px-3 py-3 text-left font-mono text-sm transition ${currentchatId === chatId ? 'border-[#242421] bg-[#fbfaf6] shadow-[3px_3px_0_#242421]' : 'border-transparent hover:border-[#aaa69c]'}`}
                 >
                   <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#ef6b4a]" />
                   <span className="truncate">{chat.title}</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => handledeletechat(chatId).catch(() => {})}
-                  disabled={isLoading}
+                  onClick={() => handleDeleteChat(chatId).catch(() => {})}
                   aria-label={`Delete ${chat.title}`}
                   title="Delete chat"
-                  className="shrink-0 rounded-md px-2 py-1 font-mono text-xs text-[#77756e] transition hover:bg-[#ef6b4a] hover:text-white disabled:cursor-wait disabled:opacity-50"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-lg text-[#77756e] transition hover:bg-[#ef6b4a] hover:text-white focus-visible:bg-[#ef6b4a] focus-visible:text-white md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
                 >
-                  Delete
+                  <span aria-hidden="true">×</span>
                 </button>
               </div>
             ))}
@@ -112,9 +106,15 @@ const Chatpage = () => {
                 {messages.map((chatMessage, index) => (
                   <div key={chatMessage._id || `${chatMessage.role}-${index}`} className={`flex items-start gap-3 ${chatMessage.role === 'user' ? 'justify-end' : ''}`}>
                     {chatMessage.role !== 'user' && <span className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#d8f26a] font-mono text-xs font-bold">ai</span>}
-                    <p className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 ${chatMessage.role === 'user' ? 'rounded-br-sm bg-[#242421] text-white' : 'rounded-bl-sm border border-[#d6d1c7] bg-white text-[#242421]'}`}>
-                      {chatMessage.content}
-                    </p>
+                    {chatMessage.role === 'user' ? (
+                      <p className="max-w-[85%] rounded-2xl rounded-br-sm bg-[#242421] px-4 py-3 text-sm leading-6 text-white">
+                        {chatMessage.content}
+                      </p>
+                    ) : (
+                      <div className="markdown-content max-w-[85%] rounded-2xl rounded-bl-sm border border-[#d6d1c7] bg-white px-4 py-3 text-sm leading-6 text-[#242421]">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{chatMessage.content}</ReactMarkdown>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

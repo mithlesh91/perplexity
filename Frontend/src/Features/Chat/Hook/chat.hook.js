@@ -1,13 +1,80 @@
 import { initlazationSocket } from "../service/chat.socketio";
-import { sendsmessage,getchats,getmessage,deletechat } from "../service/chatApi.js"
+import { deletechat, getchats, getmessage, sendsmessage } from "../service/chatApi.js"
 import { setChats, setCurrentchatId, setisLoading, seterror } from "../chatSlice.js"
 
+import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 export const usechat = () => {
 
     const dispatch = useDispatch()
     const { chats, currentchatId, isLoading, error } = useSelector((state) => state.chat)
+
+    async function handleGetChats() {
+        dispatch(setisLoading(true))
+        dispatch(seterror(null))
+        try {
+            const data = await getchats()
+            const loadedChats = Object.fromEntries(
+                (data.chat || []).map((chat) => [chat._id, chat])
+            )
+            dispatch(setChats(loadedChats))
+            return loadedChats
+        } catch (requestError) {
+            dispatch(seterror(requestError.message || "Unable to load your chats."))
+            throw requestError
+        } finally {
+            dispatch(setisLoading(false))
+        }
+    }
+
+    async function handleOpenChat(chatId) {
+        if (!chatId) return
+        if (chats[chatId]?.messages) {
+            dispatch(setCurrentchatId(chatId))
+            return chats[chatId]
+        }
+
+        dispatch(setisLoading(true))
+        dispatch(seterror(null))
+        try {
+            const data = await getmessage(chatId)
+            if (!data.chat) {
+                throw new Error("The response did not include the requested chat.")
+            }
+            dispatch(setChats({ ...chats, [chatId]: data.chat }))
+            dispatch(setCurrentchatId(chatId))
+            return data.chat
+        } catch (requestError) {
+            dispatch(seterror(requestError.message || "Unable to open this chat."))
+            throw requestError
+        } finally {
+            dispatch(setisLoading(false))
+        }
+    }
+
+    async function handleDeleteChat(chatId) {
+        dispatch(setisLoading(true))
+        dispatch(seterror(null))
+        try {
+            await deletechat(chatId)
+            const remainingChats = { ...chats }
+            delete remainingChats[chatId]
+            dispatch(setChats(remainingChats))
+            if (currentchatId === chatId) {
+                dispatch(setCurrentchatId(null))
+            }
+        } catch (requestError) {
+            dispatch(seterror(requestError.message || "Unable to delete this chat."))
+            throw requestError
+        } finally {
+            dispatch(setisLoading(false))
+        }
+    }
+
+    useEffect(() => {
+        handleGetChats().catch(() => {})
+    }, [])
 
     async function handleSendmsg({ message, chatId }) {
         dispatch(setisLoading(true))
@@ -42,89 +109,26 @@ export const usechat = () => {
         }
     }
 
-    async function handlegetchats() {
-        dispatch(setisLoading(true))
-        dispatch(seterror(null))
-        try {
-            const data = await getchats()
-            const loadedChats = Object.fromEntries(
-                (data.chat || []).map((chat) => [
-                    chat._id,
-                    { ...chat, messages: chats[chat._id]?.messages || [] }
-                ])
-            )
-            dispatch(setChats(loadedChats))
-            return data
-        } catch (error) {
-            dispatch(seterror(error.response?.data?.message || error.message || "Unable to fetch chats."))
-            throw error
-        } finally {
-            dispatch(setisLoading(false))
-        }
-    }
- 
-    async function handlegetmesage(chatId = currentchatId) {
-        if (!chatId) return null
-        dispatch(setisLoading(true))
-        dispatch(seterror(null))
-        try {
-            const data = await getmessage(chatId)
-            const loadedChat = data.chat
-            dispatch(setChats({
-                ...chats,
-                [chatId]: {
-                    ...(chats[chatId] || {}),
-                    ...loadedChat,
-                    messages: loadedChat?.messages || []
-                }
-            }))
-            return data
-        } catch (error) {
-            dispatch(seterror(error.response?.data?.message || error.message || "Unable to fetch messages."))
-            throw error
-        } finally {
-            dispatch(setisLoading(false))
-        }
-    }
-    
-    async function handledeletechat(chatId = currentchatId) {
-        if (!chatId) return null
-        dispatch(setisLoading(true))
-        dispatch(seterror(null))
-        try {
-            const data = await deletechat(chatId)
-            const remainingChats = { ...chats }
-            delete remainingChats[chatId]
-            dispatch(setChats(remainingChats))
-            if (currentchatId === chatId) dispatch(setCurrentchatId(null))
-            return data
-        } catch (error) {
-            dispatch(seterror(error.response?.data?.message || error.message || "Unable to delete chat."))
-            throw error
-        } finally {
-            dispatch(setisLoading(false))
-        }
-    }
-
-    async function handleSelectChat(chatId) {
-        dispatch(setCurrentchatId(chatId))
-        return handlegetmesage(chatId)
-    }
-
     function handleNewChat() {
         dispatch(setCurrentchatId(null))
+        dispatch(seterror(null))
     }
+
+    function handleSelectChat(chatId) {
+        handleOpenChat(chatId).catch(() => {})
+    }
+
 
 
     return {
         initlazationSocket,
         handleSendmsg,
-        handlegetchats,
-        handlegetmesage,
-        handledeletechat,
-        handleSelectChat,
+        handleGetChats,
+        handleOpenChat,
+        handleDeleteChat,
         handleNewChat,
-        
+        handleSelectChat,
+
         chats,
         currentchatId,
         isLoading,
