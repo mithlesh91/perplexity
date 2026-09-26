@@ -1,6 +1,6 @@
-import { register, login, getUser, logout, chatbot } from "../Store/auth.api"
+import { register, login, getUser, logout, chatbot } from "../service/auth.api.js"
 import { useDispatch } from "react-redux"
-import { setuser, setloading, seterror } from "../Store/Auth.slice"
+import { setuser, setloading, seterror } from "../service/Auth.slice.js"
 
 export const useAuth = () => {
     const dispatch = useDispatch()

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const Chatpage = () => {
   const navigate = useNavigate()
@@ -7,7 +8,8 @@ const Chatpage = () => {
   const [activeChat, setActiveChat] = useState(0)
   const [messages, setMessages] = useState([])
 
-  const chats = ['Research notes', 'Product strategy', 'Weekend ideas']
+  const chats = useSelector((state)=>state.chat.chats) 
+  const currentchatId = useSelector((state)=>state.chat.currentchatId)
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -37,7 +39,7 @@ const Chatpage = () => {
           </div>
 
           <nav className="mt-4 space-y-2" aria-label="Chat history">
-            {chats.map((chat, index) => (
+            {chats[currentchatId].map((chat, index) => (
               <button
                 key={chat}
                 type="button"
