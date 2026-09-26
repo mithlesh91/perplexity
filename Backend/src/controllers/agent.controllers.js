@@ -66,28 +66,28 @@ export async function getchat(req, res) {
 export async function getmessage(req, res) {
     try {
         const { chatId } = req.params
-        const chats = await chatmodel.find({
-            id: chatId,
+        const chat = await chatmodel.findOne({
+            _id: chatId,
             user: req.user.id
         })
-        if (!chats) {
+        if (!chat) {
             return res.status(404).json({
-                message: "user is not found"
+                message: "Chat is not found"
             })
         }
 
-        const message = await massegemodel.find({
+        const messages = await massegemodel.find({
             chat: chatId
-        })
+        }).sort({ createdAt: 1 })
 
         res.status(200).json({
-            message: "message is fatched",
-            chats,
-            message
+            message: "Messages fetched",
+            chat: { ...chat.toObject(), messages }
         })
 
     } catch (error) {
         console.error("error fom getmessage" + error)
+        res.status(500).json({ message: "Unable to fetch messages" })
     }
 
 }
@@ -95,28 +95,28 @@ export async function getmessage(req, res) {
 
 
 export async function deletechat(req, res) {
-   try {
-     const  {chatId}  = req.params
-    const chat = await chatmodel.findOneAndDelete({
-        _id: chatId,
-        user: req.user.id
-    })
-    await massegemodel.deleteMany({
-        chat: chatId
-    })
-
-    if (!chat) {
-        return res.status(404).json({
-            message: "chat is not found"
+    try {
+        const { chatId } = req.params
+        const chat = await chatmodel.findOneAndDelete({
+            _id: chatId,
+            user: req.user.id
         })
-    }
+        await massegemodel.deleteMany({
+            chat: chatId
+        })
 
-    res.status(200).json({
-        message:"chat is deleted"
-    })
-   } catch (error) {
-     console.error("error form deletechat" + error)
-   }
+        if (!chat) {
+            return res.status(404).json({
+                message: "chat is not found"
+            })
+        }
+
+        res.status(200).json({
+            message: "chat is deleted"
+        })
+    } catch (error) {
+        console.error("error form deletechat" + error)
+    }
 
 }
 

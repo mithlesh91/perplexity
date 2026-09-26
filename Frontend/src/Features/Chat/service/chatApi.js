@@ -20,26 +20,29 @@ export async function getchats() {
         const response = await api.get("/api/chat")
         return response.data
     } catch (error) {
-        console.log("error from getchats " + error)
+        console.error("error from getchats", error)
+        throw error
     }
 }
 
-export async function getmessage() {
+export async function getmessage(chatId) {
     try {
         const response = await api.get(`/api/${chatId}/message`)
         return response.data
     } catch (error) {
-        console.error("error form getmessages" + error)
+        console.error("error from getmessages", error)
+        throw error
     }
 
 }
 
-export async function deletechat() {
+export async function deletechat(chatId) {
     try {
-        const response = api.delete(`/delete/${chatId}/message`)
+        const response = await api.delete(`/api/delete/${chatId}/message`)
         return response.data
     } catch (error) {
-        console.error("error form deletechat" + error)
+        console.error("error from deletechat", error)
+        throw error
     }
 
 }

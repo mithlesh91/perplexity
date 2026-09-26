@@ -1,14 +1,18 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { usechat } from '../Hook/chat.hook.js'
 
 const Chatpage = () => {
   const navigate = useNavigate()
   const [message, setMessage] = useState('')
-  const { chats, currentchatId, isLoading, error, handleSendmsg, handleNewChat, handleSelectChat } = usechat()
+  const { chats, currentchatId, isLoading, error, handleSendmsg, handledeletechat, handlegetchats,  handleSelectChat, handleNewChat } = usechat()
   const currentChat = currentchatId ? chats[currentchatId] : null
   const messages = currentChat?.messages || []
   const chatList = Object.entries(chats)
+
+  useEffect(() => {
+    handlegetchats().catch(() => {})
+  }, [])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -39,23 +43,37 @@ const Chatpage = () => {
 
           <nav className="mt-4 space-y-2" aria-label="Chat history">
             {chatList.map(([chatId, chat]) => (
-              <button
+              <div
                 key={chatId}
-                type="button"
-                onClick={() => handleSelectChat(chatId)}
-                className={`flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left font-mono text-sm transition ${currentchatId === chatId ? 'border-[#242421] bg-[#fbfaf6] shadow-[3px_3px_0_#242421]' : 'border-transparent hover:border-[#aaa69c]'}`}
+                className={`flex w-full items-center gap-2 rounded-xl border px-3 py-2 transition ${currentchatId === chatId ? 'border-[#242421] bg-[#fbfaf6] shadow-[3px_3px_0_#242421]' : 'border-transparent hover:border-[#aaa69c]'}`}
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-[#ef6b4a]" />
-                <span className="truncate">{chat.title}</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => handleSelectChat(chatId)}
+                  className="flex min-w-0 flex-1 items-center gap-3 py-1 text-left font-mono text-sm"
+                >
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#ef6b4a]" />
+                  <span className="truncate">{chat.title}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handledeletechat(chatId).catch(() => {})}
+                  disabled={isLoading}
+                  aria-label={`Delete ${chat.title}`}
+                  title="Delete chat"
+                  className="shrink-0 rounded-md px-2 py-1 font-mono text-xs text-[#77756e] transition hover:bg-[#ef6b4a] hover:text-white disabled:cursor-wait disabled:opacity-50"
+                >
+                  Delete
+                </button>
+              </div>
             ))}
           </nav>
 
-          <div className="mt-auto border-t border-[#aaa69c] pt-5">
+          {/* <div className="mt-auto border-t border-[#aaa69c] pt-5">
             <button type="button" className="flex w-full items-center gap-3 font-mono text-sm text-[#77756e] transition hover:text-[#242421]">
               <span aria-hidden="true">↳</span> Settings
             </button>
-          </div>
+          </div> */}
         </aside>
 
         <section className="flex min-w-0 flex-1 flex-col">
