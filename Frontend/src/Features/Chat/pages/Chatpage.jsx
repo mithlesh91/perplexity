@@ -1,27 +1,26 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { usechat } from '../Hook/chat.hook.js'
 
 const Chatpage = () => {
   const navigate = useNavigate()
   const [message, setMessage] = useState('')
-  const [activeChat, setActiveChat] = useState(0)
-  const [messages, setMessages] = useState([])
+  const { chats, currentchatId, isLoading, error, handleSendmsg, handleNewChat, handleSelectChat } = usechat()
+  const currentChat = currentchatId ? chats[currentchatId] : null
+  const messages = currentChat?.messages || []
+  const chatList = Object.entries(chats)
 
-  const chats = useSelector((state)=>state.chat.chats) 
-  const currentchatId = useSelector((state)=>state.chat.currentchatId)
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     const trimmedMessage = message.trim()
-    if (!trimmedMessage) return
+    if (!trimmedMessage || isLoading) return
 
-    setMessages((currentMessages) => [
-      ...currentMessages,
-      { id: Date.now(), role: 'user', content: trimmedMessage },
-      { id: Date.now() + 1, role: 'assistant', content: 'I am ready to help you explore that.' },
-    ])
     setMessage('')
+    try {
+      await handleSendmsg({ message: trimmedMessage, chatId: currentchatId })
+    } catch {
+      setMessage(trimmedMessage)
+    }
   }
 
   return (
@@ -35,19 +34,19 @@ const Chatpage = () => {
 
           <div className="mt-14 flex items-center justify-between">
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#77756e]">Your chats</p>
-            <button type="button" aria-label="Start a new chat" className="text-xl leading-none transition hover:rotate-90">+</button>
+            <button type="button" onClick={handleNewChat} aria-label="Start a new chat" className="text-xl leading-none transition hover:rotate-90">+</button>
           </div>
 
           <nav className="mt-4 space-y-2" aria-label="Chat history">
-            {chats[currentchatId].map((chat, index) => (
+            {chatList.map(([chatId, chat]) => (
               <button
-                key={chat}
+                key={chatId}
                 type="button"
-                onClick={() => setActiveChat(index)}
-                className={`flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left font-mono text-sm transition ${activeChat === index ? 'border-[#242421] bg-[#fbfaf6] shadow-[3px_3px_0_#242421]' : 'border-transparent hover:border-[#aaa69c]'}`}
+                onClick={() => handleSelectChat(chatId)}
+                className={`flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left font-mono text-sm transition ${currentchatId === chatId ? 'border-[#242421] bg-[#fbfaf6] shadow-[3px_3px_0_#242421]' : 'border-transparent hover:border-[#aaa69c]'}`}
               >
                 <span className="h-1.5 w-1.5 rounded-full bg-[#ef6b4a]" />
-                <span className="truncate">{chat}</span>
+                <span className="truncate">{chat.title}</span>
               </button>
             ))}
           </nav>
@@ -75,7 +74,7 @@ const Chatpage = () => {
                 <span className="font-mono text-sm font-bold tracking-[-0.08em]">perplexity</span>
               </div>
             </div>
-            <div className="hidden font-mono text-xs text-[#77756e] md:block">{chats[activeChat]}</div>
+            <div className="hidden font-mono text-xs text-[#77756e] md:block">{currentChat?.title || 'New conversation'}</div>
             <button type="button" className="flex items-center gap-2 rounded-full border border-[#242421] bg-[#fffdf8] px-3 py-2 font-mono text-xs font-bold transition hover:bg-[#d8f26a] sm:px-4">
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#242421] text-[10px] text-white">U</span>
               <span className="hidden sm:inline">user</span>
@@ -92,9 +91,9 @@ const Chatpage = () => {
               </div>
             ) : (
               <div className="mx-auto flex w-full max-w-2xl flex-col gap-5">
-                {messages.map((chatMessage) => (
-                  <div key={chatMessage.id} className={`flex items-start gap-3 ${chatMessage.role === 'user' ? 'justify-end' : ''}`}>
-                    {chatMessage.role === 'assistant' && <span className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#d8f26a] font-mono text-xs font-bold">ai</span>}
+                {messages.map((chatMessage, index) => (
+                  <div key={chatMessage._id || `${chatMessage.role}-${index}`} className={`flex items-start gap-3 ${chatMessage.role === 'user' ? 'justify-end' : ''}`}>
+                    {chatMessage.role !== 'user' && <span className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#d8f26a] font-mono text-xs font-bold">ai</span>}
                     <p className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 ${chatMessage.role === 'user' ? 'rounded-br-sm bg-[#242421] text-white' : 'rounded-bl-sm border border-[#d6d1c7] bg-white text-[#242421]'}`}>
                       {chatMessage.content}
                     </p>
@@ -105,6 +104,7 @@ const Chatpage = () => {
           </div>
 
           <div className="w-full px-4 pb-4 sm:px-8 sm:pb-7">
+            {error && <p role="alert" className="mx-auto mb-3 max-w-2xl text-sm text-[#c5482f]">{error}</p>}
             <form onSubmit={handleSubmit} className="mx-auto flex w-full max-w-2xl items-center gap-3 rounded-2xl border border-[#242421] bg-[#fffdf8] p-2 pl-4 shadow-[3px_3px_0_#242421] focus-within:bg-white">
               <input
                 type="text"
@@ -114,7 +114,7 @@ const Chatpage = () => {
                 aria-label="Ask a question"
                 className="min-w-0 flex-1 bg-transparent py-3 font-mono text-sm outline-none placeholder:text-[#aaa69c]"
               />
-              <button type="submit" aria-label="Send question" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#242421] text-lg text-white transition hover:bg-[#ef6b4a]">↑</button>
+              <button type="submit" aria-label="Send question" disabled={isLoading} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#242421] text-lg text-white transition hover:bg-[#ef6b4a] disabled:cursor-wait disabled:opacity-60">{isLoading ? '…' : '↑'}</button>
             </form>
             <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.16em] text-[#aaa69c]">Powered by curiosity</p>
           </div>

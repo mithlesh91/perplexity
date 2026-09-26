@@ -7,16 +7,17 @@ const api = axios.create({
 
 export async function sendsmessage({ message, chatId }) {
     try {
-        const response = await api.post("ai", { message, chatId })
+        const response = await api.post("/api/ai", { message, chatId })
         return response.data
     } catch (error) {
-        console.error("error form chatresponse" + chatsresponse)
+        console.error("error from chat response", error)
+        throw error
     }
 }
 
 export async function getchats() {
     try {
-        const response = await api.get("/chat")
+        const response = await api.get("/api/chat")
         return response.data
     } catch (error) {
         console.log("error from getchats " + error)
@@ -25,7 +26,7 @@ export async function getchats() {
 
 export async function getmessage() {
     try {
-        const response = await api.get(`/${chatId}/message`)
+        const response = await api.get(`/api/${chatId}/message`)
         return response.data
     } catch (error) {
         console.error("error form getmessages" + error)
