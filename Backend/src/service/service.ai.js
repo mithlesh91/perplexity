@@ -11,6 +11,7 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { sendMail } from "../service/node.mailer.js";
 
 import { searchTavily } from "./tavily.js";
+import { Query } from "mongoose";
 
 const SearchInternet = tool(searchTavily,{
   name:"SearchInternet",
@@ -48,14 +49,21 @@ export const agent = createAgent({
   });
 
 export async function generateresponse(messages) {
-    const response = await agent.invoke({messages:messages.map((msg)=>{
+    const response = await agent.invoke({messages:[
+      new SystemMessage(`
+                You are a helpful and precise assistant for answering questions.
+                If you don't know the answer, say you don't know. 
+                If the question requires up-to-date information, use the "searchInternet" tool to get the latest information from the internet and then answer based on the search results.
+            `),
+      ...messages.map((msg)=>{
       if(msg.role == "user"){
         return new HumanMessage(msg.content)
       } else if (msg.role == "ai") {
         return new AIMessage(msg.content)
       }
-    })})
-    return response.text
+    })
+    ]})
+     return response.messages[ response.messages.length - 1 ].text;
 }
 
 

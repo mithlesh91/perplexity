@@ -6,6 +6,11 @@ async function agentcontroller(req, res) {
     try {
         const { message, chatId } = req.body
 
+
+        console.log("req.body:", req.body)
+        console.log("message:", message)
+        console.log("chatId:", chatId)
+
         let title = null, chat = null;
 
         if (!chatId) {
@@ -35,6 +40,9 @@ async function agentcontroller(req, res) {
             content: result,
             role: "ai"
         })
+
+
+
 
         res.status(200).json({
             title,
