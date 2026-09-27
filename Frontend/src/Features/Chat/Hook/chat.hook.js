@@ -80,7 +80,7 @@ export const usechat = () => {
         dispatch(setisLoading(true))
         dispatch(seterror(null))
         try {
-            const data = await sendsmessage({ message,chat:chatId })
+            const data = await sendsmessage({ message,chatId })
             const resolvedChatId = chatId || data.chat?._id
 
             if (!resolvedChatId) {
