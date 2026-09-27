@@ -11,13 +11,12 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { sendMail } from "../service/node.mailer.js";
 
 import { searchTavily } from "./tavily.js";
-import { Query } from "mongoose";
 
-const SearchInternet = tool(searchTavily,{
+const SearchInternetTool = tool(searchTavily,{
   name:"SearchInternet",
   description:"use this tool to get information from the internet ",
   schema:z.object({
-    Query:z.string().describe("the search query to look up on the internet")
+    query:z.string().describe("the search query to look up on the internet")
   })
   
 })
@@ -45,7 +44,7 @@ const GoogleModel = new ChatGoogleGenerativeAI({
 
 export const agent = createAgent({
     model:GoogleModel,
-    tools: [Emailtool,SearchInternet],
+    tools: [Emailtool,SearchInternetTool],
   });
 
 export async function generateresponse(messages) {
