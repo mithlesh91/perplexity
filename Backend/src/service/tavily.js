@@ -1,10 +1,12 @@
-const { tavily } = require("@tavily/core");
+import { tavily } from "@tavily/core";
 
 const tvly = tavily({
-   apikey: process.env.TAVILY_API_KEY
+    apiKey: process.env.TAVILY_API_KEY
 });
 
 export const searchTavily = async (query) => {
-   const response = await tvly.search(query);
-   console.log(response);
-}
+    return await tvly.search(query, {
+        maxResults: 5,
+        searchDepth: "advanced"
+    });
+};

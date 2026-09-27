@@ -10,6 +10,17 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 
 import { sendMail } from "../service/node.mailer.js";
 
+import { searchTavily } from "./tavily.js";
+
+const SearchInternet = tool(searchTavily,{
+  name:"SearchInternet",
+  description:"use this tool to get information from the internet ",
+  schema:z.object({
+    Query:z.string().describe("the search query to look up on the internet")
+  })
+  
+})
+
 const Emailtool = tool(sendMail, {
     name: "Emailtool",
     description:
@@ -31,16 +42,23 @@ const GoogleModel = new ChatGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_API_KEY
 });
 
+export const agent = createAgent({
+    model:GoogleModel,
+    tools: [Emailtool,SearchInternet],
+  });
+
 export async function generateresponse(messages) {
-    const response = await GoogleModel.invoke(messages.map((msg)=>{
+    const response = await agent.invoke({messages:messages.map((msg)=>{
       if(msg.role == "user"){
         return new HumanMessage(msg.content)
       } else if (msg.role == "ai") {
         return new AIMessage(msg.content)
       }
-    }))
+    })})
     return response.text
 }
+
+
 
 export async function generatechattitle(message) {
     const response = await Mistralmodel.invoke([
@@ -53,7 +71,4 @@ export async function generatechattitle(message) {
     return response.text
 }
 
-  // export const agent = createAgent({
-  //   model,
-  //   tools: [Emailtool],
-  // });
+  
