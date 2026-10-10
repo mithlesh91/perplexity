@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken"
 
 export async function usercontroller(req, res) {
    try {
-      const { username, password, email } = req.body
+      const { username, password, email,name } = req.body
 
       //input check
       if (!username || !email || !password) {
@@ -28,7 +28,7 @@ export async function usercontroller(req, res) {
       }
 
       const newuser = await user.create({
-         username, email, name: username, password
+         username, email, name, password
       })
       const emailverifytoken = jwt.sign(
          {
