@@ -1,7 +1,7 @@
 import { Router } from "express";
 import passport from "passport";
 import uservalidation from "../allvalidation/validation.js";
-import { usercontroller,googleAuth } from "../controllers/user.controllers.js";
+import { usercontroller } from "../controllers/user.controllers.js";
 import { verifyEmail } from "../controllers/user.controllers.js";
 import { logincontroller } from "../controllers/user.controllers.js";
 import loginvalidation from "../allvalidation/login.validation.js";
@@ -21,4 +21,4 @@ Rrouter.get('/auth/google',
 );
 
 Rrouter.get('/auth/google/callback',
-  passport.authenticate('google', { session: false }),googleAuth)
+  passport.authenticate('google', { session: false }))
