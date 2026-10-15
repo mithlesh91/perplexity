@@ -1,8 +1,12 @@
+import dotenv from "dotenv"
+dotenv.config()
 import express from "express"
 import morgan from "morgan"
 import cookieParser from "cookie-parser"
 import cors from "cors"
 import path from "path"
+import passport from "passport"
+import {Strategy as GoogleStrategy} from "passport-google-oauth20"
 import { fileURLToPath } from "url"
 
 import { Rrouter } from "./routes.js/user.router.js"
@@ -35,6 +39,19 @@ console.log("__dirname:", __dirname)
 
 // Serve React build
 app.use(express.static(path.join(__dirname, "../public")))
+
+
+app.use(passport.initialize())
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLINENT_ID,
+  clientSecret: process.env.GOOGLE_CLINENT_SECRET,
+  callbackURL: '/api/auth/google/callback',
+}, (accessToken, refreshToken, profile, done) => {
+  
+    return done(null , profile)
+}));
+
 
 // React Router fallback
 app.get("*name", (req, res) => {

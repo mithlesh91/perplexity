@@ -96,6 +96,7 @@ const Login = () => {
             Login
           </button>
           {error && (<p className='text-red-500'>{error}</p>)}
+          <a href="/api/auth/google">continue with google</a>
         </form>
 
         <p className="mt-6 text-center text-sm text-slate-400">

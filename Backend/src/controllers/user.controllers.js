@@ -136,7 +136,6 @@ export async function logout(req,res) {
 }
 
 
-
 export async function verifyEmail(req, res) {
    try {
       const { token } = req.query;
@@ -174,5 +173,13 @@ export async function verifyEmail(req, res) {
          message: "Invalid or expired token",
       });
    }
+}
+
+export async function googleAuth(req,res) {
+   
+   console.log(req.user)
+   
+   res.redirect("http://localhost:5173/chat")
+   
 }
 
